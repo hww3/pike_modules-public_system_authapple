@@ -1,0 +1,70 @@
+/*! @module Public
+ */
+
+/*! @module System
+ */
+
+/*! @module AppleAuth
+ */
+
+#define _GNU_SOURCE
+
+#include "auth_apple_config.h"
+#include "util.h"
+#include "checkpw.h"
+
+typedef struct
+{
+    int started;
+} AUTH_OBJECT_DATA;
+
+CVAR AUTH_OBJECT_DATA   *object_data;
+
+
+PIKEFUN int checkpw(string user, string pw)
+{
+  int r;
+
+  push_string(user);
+  f_string_to_utf8(1);
+  user = Pike_sp[-1].u.string;
+  push_string(pw);
+  f_string_to_utf8(1);
+  pw = Pike_sp[-1].u.string;
+
+  r = checkpw(user->str, pw->str);
+
+  pop_n_elems(4);
+
+  push_int(r);
+}
+
+INIT
+{
+    AUTH_OBJECT_DATA * dta = 
+	(AUTH_OBJECT_DATA*)malloc(sizeof(AUTH_OBJECT_DATA));
+    if (!dta)
+        Pike_error("init_apple_auth: Out of memory!\n");
+
+    THIS->object_data = dta;
+}
+
+EXIT 
+{
+  if(THIS->object_data)
+  {
+    free(THIS->object_data);
+  }
+}
+
+
+/*! @endmodule
+ */
+
+/*! @endmodule
+ */
+
+/*! @endmodule
+ */
+
+
